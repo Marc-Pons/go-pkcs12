@@ -452,7 +452,8 @@ func getSafeContents(p12Data, password []byte, expectedItems int) (bags []safeBa
 // can be set to [crypto/rand.Reader].
 //
 // Encode emulates the behavior of OpenSSL's PKCS12_create: it creates two
-// SafeContents: one that's encrypted with RC2 and contains the certificates,
+// SafeContents: one that contains the certificates and it's encrypted
+// with RC2 when desCert is false, otherwise triple DES encryption is used;
 // and another that is unencrypted and contains the private key shrouded with
 // 3DES  The private key bag and the end-entity certificate bag have the
 // LocalKeyId attribute set to the SHA-1 fingerprint of the end-entity
@@ -552,8 +553,9 @@ func Encode(rand io.Reader, privateKey interface{}, certificate *x509.Certificat
 // The rand argument is used to provide entropy for the encryption, and
 // can be set to [crypto/rand.Reader].
 //
-// EncodeTrustStore creates a single SafeContents that's encrypted with RC2
-// and contains the certificates.
+// EncodeTrustStore creates a single SafeContents that contains the certificates
+// and it's encrypted with RC2 if desCert is false, otherwise triple DES encryption
+// is used.
 //
 // The Subject of the certificates are used as the Friendly Names (Aliases)
 // within the resulting pfxData. If certificates share a Subject, then the
@@ -596,8 +598,9 @@ type TrustStoreEntry struct {
 // The rand argument is used to provide entropy for the encryption, and
 // can be set to [crypto/rand.Reader].
 //
-// EncodeTrustStoreEntries creates a single SafeContents that's encrypted
-// with RC2 and contains the certificates.
+// EncodeTrustStoreEntries creates a single SafeContents that contains the certificates
+// and it's encrypted with RC2 if desCert is false, otherwise triple DES encryption
+// is used.
 func EncodeTrustStoreEntries(rand io.Reader, entries []TrustStoreEntry, password string, desCert bool) (pfxData []byte, err error) {
 	encodedPassword, err := bmpStringZeroTerminated(password)
 	if err != nil {
