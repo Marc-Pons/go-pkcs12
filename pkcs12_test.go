@@ -71,7 +71,36 @@ func TestTrustStore(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		pfxData, err := EncodeTrustStore(rand.Reader, []*x509.Certificate{cert}, "password")
+		pfxData, err := EncodeTrustStore(rand.Reader, []*x509.Certificate{cert}, "password", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		decodedCerts, err := DecodeTrustStore(pfxData, "password")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if len(decodedCerts) != 1 {
+			t.Fatal("Unexpected number of certs")
+		}
+
+		if decodedCerts[0].Subject.CommonName != commonName {
+			t.Errorf("expected common name to be %q, but found %q", commonName, decodedCerts[0].Subject.CommonName)
+		}
+	}
+}
+
+func TestTrustStoreDesEncryption(t *testing.T) {
+	for commonName, base64P12 := range testdata {
+		p12, _ := base64.StdEncoding.DecodeString(base64P12)
+
+		_, cert, err := Decode(p12, "")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		pfxData, err := EncodeTrustStore(rand.Reader, []*x509.Certificate{cert}, "password", true)
 		if err != nil {
 			t.Fatal(err)
 		}
