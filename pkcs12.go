@@ -732,10 +732,9 @@ func makeSafeContents(rand io.Reader, bags []safeBag, password []byte, desCert b
 		}
 
 		var algo pkix.AlgorithmIdentifier
+		algo.Algorithm = oidPBEWithSHAAnd40BitRC2CBC
 		if desCert {
 			algo.Algorithm = oidPBEWithSHAAnd3KeyTripleDESCBC
-		} else {
-			algo.Algorithm = oidPBEWithSHAAnd40BitRC2CBC
 		}
 
 		if algo.Parameters.FullBytes, err = asn1.Marshal(pbeParams{Salt: randomSalt, Iterations: 2048}); err != nil {
