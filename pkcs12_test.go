@@ -91,35 +91,6 @@ func TestTrustStore(t *testing.T) {
 	}
 }
 
-func TestTrustStoreDesEncryption(t *testing.T) {
-	for commonName, base64P12 := range testdata {
-		p12, _ := base64.StdEncoding.DecodeString(base64P12)
-
-		_, cert, err := Decode(p12, "")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		pfxData, err := EncodeTrustStore(rand.Reader, []*x509.Certificate{cert}, "password", true)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		decodedCerts, err := DecodeTrustStore(pfxData, "password")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if len(decodedCerts) != 1 {
-			t.Fatal("Unexpected number of certs")
-		}
-
-		if decodedCerts[0].Subject.CommonName != commonName {
-			t.Errorf("expected common name to be %q, but found %q", commonName, decodedCerts[0].Subject.CommonName)
-		}
-	}
-}
-
 func TestPBES2(t *testing.T) {
 	// This P12 PDU is a self-signed certificate exported via Windows certmgr.
 	// It is encrypted with the following options (verified via openssl): PBES2, PBKDF2, AES-256-CBC, Iteration 2000, PRF hmacWithSHA256
